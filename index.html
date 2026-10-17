@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Recipe Collection</title>
+<meta name="description" content="A personal cookbook built from my saved Instagram recipes — with ingredients, steps, time, calories and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDF8F0; --cream2:#F7EEDF; --ink:#2E2118; --ink-soft:#6B5847;
+  --terra:#C2410C; --terra-dark:#9A3412; --gold:#D97706; --sage:#4D7C0F;
+  --card:#FFFFFF; --line:#EADDC8; --chip:#F3E8D3;
+  --shadow:0 10px 30px rgba(120,72,20,.10), 0 2px 6px rgba(120,72,20,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:'Inter',system-ui,sans-serif; background:var(--cream); color:var(--ink); line-height:1.55;}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;}
+.wrap{max-width:1200px; margin:0 auto; padding:0 20px;}
+/* ---------- header ---------- */
+header.hero{background:linear-gradient(135deg,#2E2118 0%,#4A2E1B 55%,#7C2D12 100%); color:#FFF7EA; padding:56px 0 40px; position:relative; overflow:hidden;}
+header.hero::after{content:"🍛 🍰 🥘 🍳 🥗"; position:absolute; right:24px; top:18px; font-size:34px; letter-spacing:14px; opacity:.35; filter:saturate(1.4);}
+.hero h1{font-size:clamp(34px,5vw,54px); font-weight:900; letter-spacing:-.5px;}
+.hero h1 .accent{color:#FDBA74;}
+.hero p.sub{color:#E7D3B8; margin-top:10px; font-size:17px; max-width:640px;}
+.stats{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;}
+.stat{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:14px; padding:10px 18px; backdrop-filter:blur(4px);}
+.stat b{font-size:22px; font-weight:700; display:block; font-family:'Fraunces',serif;}
+.stat span{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:#E7D3B8;}
+/* ---------- toolbar ---------- */
+.toolbar{position:sticky; top:0; z-index:50; background:rgba(253,248,240,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding:14px 0;}
+.toolbar .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.search{flex:1 1 240px; display:flex; align-items:center; background:#fff; border:1px solid var(--line); border-radius:999px; padding:10px 18px; box-shadow:var(--shadow);}
+.search input{border:0; outline:0; flex:1; font-size:15px; background:transparent; color:var(--ink);}
+.search .icon{margin-right:8px; opacity:.6;}
+select.filter{background:#fff; border:1px solid var(--line); border-radius:999px; padding:10px 14px; font-size:14px; color:var(--ink); cursor:pointer;}
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+.chip{border:1px solid var(--line); background:var(--chip); color:var(--ink); border-radius:999px; padding:8px 16px; font-size:13.5px; font-weight:600; cursor:pointer; transition:.15s;}
+.chip:hover{transform:translateY(-1px); box-shadow:var(--shadow);}
+.chip.active{background:var(--terra); border-color:var(--terra); color:#fff;}
+.chip .n{opacity:.65; font-weight:500; margin-left:4px;}
+/* ---------- grid ---------- */
+#count{margin:26px 0 14px; color:var(--ink-soft); font-size:14px;}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:22px; padding-bottom:60px;}
+.card{background:var(--card); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); cursor:pointer; transition:transform .18s, box-shadow .18s; border:1px solid #F1E4CC; display:flex; flex-direction:column;}
+.card:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(120,72,20,.16);}
+.thumb{height:170px; position:relative; background-size:cover; background-position:center;}
+.thumb.ph{display:flex; align-items:center; justify-content:center; font-size:64px;}
+.thumb.ph.Breakfast{background:linear-gradient(135deg,#FDE68A,#F59E0B);}
+.thumb.ph.Entree{background:linear-gradient(135deg,#BBF7D0,#16A34A);}
+.thumb.ph.MainCourse{background:linear-gradient(135deg,#FDBA74,#C2410C);}
+.thumb.ph.SideDish{background:linear-gradient(135deg,#FDE68A,#84CC16);}
+.thumb.ph.Snack{background:linear-gradient(135deg,#FBCFE8,#DB2777);}
+.thumb.ph.Dessert{background:linear-gradient(135deg,#DDD6FE,#7C3AED);}
+.thumb.ph.Beverage{background:linear-gradient(135deg,#BAE6FD,#0284C7);}
+.catbadge{position:absolute; top:12px; left:12px; background:rgba(46,33,24,.82); color:#FFF7EA; font-size:11.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; padding:5px 12px; border-radius:999px;}
+.cardbody{padding:16px 18px 18px; display:flex; flex-direction:column; gap:8px; flex:1;}
+.cardbody h3{font-size:19px; font-weight:700; line-height:1.3;}
+.meta{display:flex; gap:12px; font-size:13px; color:var(--ink-soft); flex-wrap:wrap;}
+.meta b{color:var(--ink); font-weight:600;}
+.cuisine{font-size:12.5px; color:var(--ink-soft); font-style:italic;}
+.bestfor{font-size:12.5px; color:var(--terra-dark); background:#FEF3E8; border-radius:10px; padding:6px 10px; margin-top:auto;}
+.est{font-size:10.5px; color:#A16207; background:#FEF9C3; border-radius:6px; padding:1px 6px; margin-left:4px; font-weight:700; cursor:help;}
+/* ---------- modal ---------- */
+.overlay{position:fixed; inset:0; background:rgba(46,33,24,.55); z-index:100; display:none; align-items:flex-start; justify-content:center; padding:32px 16px; overflow-y:auto; backdrop-filter:blur(3px);}
+.overlay.open{display:flex;}
+.modal{background:var(--cream); border-radius:24px; max-width:760px; width:100%; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.3); animation:pop .22s ease-out; position:relative;}
+@keyframes pop{from{transform:translateY(16px) scale(.98); opacity:0} to{transform:none; opacity:1}}
+.modal .heroimg{height:260px; background-size:cover; background-position:center; position:relative;}
+.modal .heroimg.ph{display:flex; align-items:center; justify-content:center; font-size:96px;}
+.modal .close{position:absolute; top:14px; right:14px; background:rgba(46,33,24,.75); color:#fff; border:0; width:38px; height:38px; border-radius:50%; font-size:18px; cursor:pointer;}
+.modal .pad{padding:26px 30px 34px;}
+.modal h2{font-size:30px; font-weight:900; line-height:1.2; margin-bottom:6px;}
+.modal .sub{color:var(--ink-soft); margin-bottom:18px;}
+.infogrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:22px;}
+.info{background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 14px;}
+.info .k{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); font-weight:700;}
+.info .v{font-size:17px; font-weight:700; margin-top:2px;}
+.info .v small{font-weight:500; color:var(--ink-soft); font-size:12px;}
+.modal h4.sec{font-size:13px; text-transform:uppercase; letter-spacing:1.5px; color:var(--terra); margin:22px 0 12px; font-weight:700;}
+ul.ings{list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+@media(max-width:600px){ul.ings{grid-template-columns:1fr;}}
+ul.ings li{background:#fff; border:1px solid var(--line); border-radius:10px; padding:9px 13px; font-size:14px; display:flex; gap:8px; align-items:baseline;}
+ul.ings li::before{content:"▢"; color:var(--terra); font-weight:700;}
+ul.ings li.done{opacity:.55; text-decoration:line-through;}
+ul.ings li.done::before{content:"☑";}
+ul.ings .m{color:var(--ink-soft); font-size:12.5px;}
+ol.steps{list-style:none; counter-reset:step; display:flex; flex-direction:column; gap:12px;}
+ol.steps li{counter-increment:step; background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 16px 13px 58px; position:relative; font-size:14.5px;}
+ol.steps li::before{content:counter(step); position:absolute; left:14px; top:12px; width:30px; height:30px; border-radius:50%; background:var(--terra); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:14px;}
+.yt{display:inline-block; margin-top:20px; background:#FF0000; color:#fff; font-weight:700; padding:11px 22px; border-radius:999px; text-decoration:none; font-size:14px;}
+.note{background:#FFFBEB; border:1px dashed var(--gold); border-radius:12px; padding:12px 16px; font-size:13px; color:#92400E; margin-top:18px;}
+footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--ink-soft); font-size:13px;}
+footer a{color:var(--terra);}
+.empty{text-align:center; padding:70px 20px; color:var(--ink-soft);}
+.empty .big{font-size:54px; margin-bottom:12px;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <h1>My Recipe <span class="accent">Collection</span> 🍳</h1>
+    <p class="sub">Every recipe I've saved, in one cozy cookbook — with ingredients, step-by-step method, cooking time, calories and the perfect moment to make it.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+<div class="toolbar">
+  <div class="wrap">
+    <div class="row">
+      <label class="search"><span class="icon">🔍</span><input id="q" type="search" placeholder="Search recipes or ingredients…"></label>
+      <select class="filter" id="cuisine"><option value="">All cuisines</option></select>
+      <select class="filter" id="sort">
+        <option value="saved">Sort: Most saved</option>
+        <option value="az">Sort: A – Z</option>
+        <option value="quick">Sort: Quickest</option>
+        <option value="light">Sort: Lightest (calories)</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+<div class="wrap">
+  <div id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none"><div class="big">🍽️</div><h3 class="serif">No recipes found</h3><p>Try a different search or filter.</p></div>
+</div>
+<footer>
+  <div class="wrap">
+    Built from my saved recipe collection · Recipe details enriched via <a href="https://www.themealdb.com" target="_blank" rel="noopener">TheMealDB</a> ·
+    Times &amp; calories marked <span class="est">est.</span> are sensible estimates — check the original recipe for exact values.
+  </div>
+</footer>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+<script>
+const SHARDS = ["data/recipes.json"];
+const CATS = ["Breakfast","Entree","Main Course","Side Dish","Snack","Dessert","Beverage"];
+const CAT_EMOJI = {Breakfast:"🍳",Entree:"🥗","Main Course":"🍛","Side Dish":"🥘",Snack:"🍿",Dessert:"🍰",Beverage:"🥤"};
+const CAT_LABEL = {"Main Course":"Main Course",Entree:"Entree"};
+let RECIPES = [];
+let state = {q:"", cat:"", cuisine:"", sort:"saved"};
+
+async function load(){
+  const parts = await Promise.all(SHARDS.map(async s=>{
+    try{ const r = await fetch(s); if(!r.ok) return []; return await r.json(); }catch(e){ return []; }
+  }));
+  RECIPES = parts.flat();
+  init();
+}
+function catLabel(c){ return CAT_LABEL[c]||c; }
+function esc(s){ return String(s??"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function thumb(r, cls){
+  if(r.image) return `<div class="thumb ${cls}" style="background-image:url('${esc(r.image)}')"><span class="catbadge">${esc(catLabel(r.category))}</span></div>`;
+  const key = r.category.replace(/ /g,"");
+  return `<div class="thumb ph ${key} ${cls}"><span>${CAT_EMOJI[r.category]||"🍽️"}</span><span class="catbadge">${esc(catLabel(r.category))}</span></div>`;
+}
+function metaLine(r){
+  const t = r.time_min ? `⏱ <b>${r.time_min} min</b>${r.time_source==="estimated"?'<span class="est" title="Estimated cooking time">est.</span>':''}` : "";
+  const c = r.calories ? `🔥 <b>${r.calories}</b> kcal${r.calories_source==="estimated"?'<span class="est" title="Estimated calories per serving">est.</span>':''}` : "";
+  return `<div class="meta"><span>${t}</span><span>${c}</span></div>`;
+}
+function filtered(){
+  let list = RECIPES.slice();
+  if(state.cat) list = list.filter(r=>r.category===state.cat);
+  if(state.cuisine) list = list.filter(r=>r.cuisine===state.cuisine);
+  if(state.q){
+    const q = state.q.toLowerCase();
+    list = list.filter(r=> r.name.toLowerCase().includes(q) ||
+      (r.ingredients||[]).some(i=>(i.item||"").toLowerCase().includes(q)));
+  }
+  if(state.sort==="az") list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(state.sort==="quick") list.sort((a,b)=>(a.time_min||999)-(b.time_min||999));
+  else if(state.sort==="light") list.sort((a,b)=>(a.calories||9999)-(b.calories||9999));
+  else list.sort((a,b)=>(b.saved_count||0)-(a.saved_count||0) || a.name.localeCompare(b.name));
+  return list;
+}
+function render(){
+  const list = filtered();
+  const grid = document.getElementById("grid");
+  document.getElementById("count").textContent = `Showing ${list.length} of ${RECIPES.length} recipes`;
+  document.getElementById("empty").style.display = list.length? "none":"block";
+  grid.innerHTML = list.map(r=>`
+    <article class="card" data-id="${esc(r.id)}">
+      ${thumb(r,"")}
+      <div class="cardbody">
+        <h3>${esc(r.name)}</h3>
+        ${r.cuisine?`<div class="cuisine">${esc(r.cuisine)} cuisine</div>`:""}
+        ${metaLine(r)}
+        <div class="bestfor">✨ ${esc(r.best_time_to_cook||"")}</div>
+      </div>
+    </article>`).join("");
+  grid.querySelectorAll(".card").forEach(c=>c.addEventListener("click",()=>openModal(c.dataset.id)));
+}
+function openModal(id){
+  const r = RECIPES.find(x=>x.id===id); if(!r) return;
+  const ings = (r.ingredients||[]).map(i=>
+    `<li><span>${esc(i.item)}${i.measure?` <span class="m">— ${esc(i.measure)}</span>`:""}</span></li>`).join("");
+  const steps = (r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("");
+  const m = document.getElementById("modal");
+  m.innerHTML = `
+    ${thumb(r,"heroimg")}
+    <button class="close" id="mclose" aria-label="Close">✕</button>
+    <div class="pad">
+      <h2>${esc(r.name)}</h2>
+      <div class="sub">${esc(catLabel(r.category))}${r.cuisine?` · ${esc(r.cuisine)} cuisine`:""}${r.saved_count>1?` · saved ${r.saved_count}×`:""}</div>
+      <div class="infogrid">
+        <div class="info"><div class="k">⏱ Cooking time</div><div class="v">${r.time_min?r.time_min+" min":"—"} ${r.time_source==="estimated"?'<small>(est.)</small>':""}</div></div>
+        <div class="info"><div class="k">🔥 Calories</div><div class="v">${r.calories?r.calories+" <small>kcal / serving</small>":"—"} ${r.calories_source==="estimated"?'<small>(est.)</small>':""}</div></div>
+        <div class="info"><div class="k">🛋️ Comfy time to cook</div><div class="v" style="font-size:14px; font-weight:600;">${esc(r.best_time_to_cook||"—")}</div></div>
+        <div class="info"><div class="k">🧂 Ingredients</div><div class="v">${(r.ingredients||[]).length||"—"}</div></div>
+      </div>
+      ${ings?`<h4 class="sec">Ingredients needed</h4><ul class="ings" id="inglist">${ings}</ul>`:""}
+      ${steps?`<h4 class="sec">How to cook — steps</h4><ol class="steps">${steps}</ol>`
+        :`<div class="note">No step-by-step method on file for this one yet — the recipe details here come from the dish's listing. Check the video link below for the full method.</div>`}
+      ${r.youtube?`<a class="yt" href="${esc(r.youtube)}" target="_blank" rel="noopener">▶ Watch video recipe</a>`:""}
+      ${(r.time_source==="estimated"||r.calories_source==="estimated")?`<div class="note">Heads-up: the time and/or calories for this recipe are estimates based on its category. Treat them as a rough guide.</div>`:""}
+    </div>`;
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  document.getElementById("mclose").onclick = closeModal;
+  const il = document.getElementById("inglist");
+  if(il) il.querySelectorAll("li").forEach(li=>li.addEventListener("click",()=>li.classList.toggle("done")));
+}
+function closeModal(){
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+function init(){
+  // stats
+  const cats = new Set(RECIPES.map(r=>r.category));
+  const cuis = new Set(RECIPES.map(r=>r.cuisine).filter(Boolean));
+  const withImg = RECIPES.filter(r=>r.image).length;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><b>${RECIPES.length}</b><span>recipes</span></div>
+    <div class="stat"><b>${cats.size}</b><span>categories</span></div>
+    <div class="stat"><b>${cuis.size}</b><span>cuisines</span></div>
+    <div class="stat"><b>${withImg}</b><span>with photos</span></div>`;
+  // chips
+  const counts = {};
+  RECIPES.forEach(r=>counts[r.category]=(counts[r.category]||0)+1);
+  const chips = document.getElementById("chips");
+  chips.innerHTML = `<button class="chip active" data-c="">All <span class="n">${RECIPES.length}</span></button>` +
+    CATS.filter(c=>counts[c]).map(c=>`<button class="chip" data-c="${c}">${CAT_EMOJI[c]} ${catLabel(c)} <span class="n">${counts[c]}</span></button>`).join("");
+  chips.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{
+    chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    ch.classList.add("active"); state.cat = ch.dataset.c; render();
+  }));
+  // cuisines
+  const csel = document.getElementById("cuisine");
+  [...cuis].sort().forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c; csel.appendChild(o); });
+  csel.addEventListener("change",()=>{ state.cuisine = csel.value; render(); });
+  document.getElementById("sort").addEventListener("change",e=>{ state.sort = e.target.value; render(); });
+  let deb;
+  document.getElementById("q").addEventListener("input",e=>{ clearTimeout(deb); deb=setTimeout(()=>{ state.q=e.target.value.trim(); render(); },180); });
+  document.getElementById("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") closeModal(); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal(); });
+  render();
+}
+load();
+</script>
+</body>
+</html>
