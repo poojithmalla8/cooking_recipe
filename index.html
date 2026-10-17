@@ -135,7 +135,6 @@ footer a{color:var(--terra);}
 </footer>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
 <script>
-const SHARDS = ["data/recipes.json"];
 const CATS = ["Breakfast","Entree","Main Course","Side Dish","Snack","Dessert","Beverage"];
 const CAT_EMOJI = {Breakfast:"🍳",Entree:"🥗","Main Course":"🍛","Side Dish":"🥘",Snack:"🍿",Dessert:"🍰",Beverage:"🥤"};
 const CAT_LABEL = {"Main Course":"Main Course",Entree:"Entree"};
@@ -143,9 +142,15 @@ let RECIPES = [];
 let state = {q:"", cat:"", cuisine:"", sort:"saved"};
 
 async function load(){
-  const parts = await Promise.all(SHARDS.map(async s=>{
-    try{ const r = await fetch(s); if(!r.ok) return []; return await r.json(); }catch(e){ return []; }
-  }));
+  const parts = [];
+  for(let i=1; ; i++){
+    const s = "data/recipes-" + String(i).padStart(2,"0") + ".json";
+    try{
+      const r = await fetch(s);
+      if(!r.ok) break;
+      parts.push(await r.json());
+    }catch(e){ break; }
+  }
   RECIPES = parts.flat();
   init();
 }
