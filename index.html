@@ -203,6 +203,7 @@ function openModal(id){
   const ings = (r.ingredients||[]).map(i=>
     `<li><span>${esc(i.item)}${i.measure?` <span class="m">— ${esc(i.measure)}</span>`:""}</span></li>`).join("");
   const steps = (r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("");
+  const hasIngs = (r.ingredients||[]).length>0, hasSteps = (r.steps||[]).length>0;
   const m = document.getElementById("modal");
   m.innerHTML = `
     ${thumb(r,"heroimg")}
@@ -216,9 +217,10 @@ function openModal(id){
         <div class="info"><div class="k">🛋️ Comfy time to cook</div><div class="v" style="font-size:14px; font-weight:600;">${esc(r.best_time_to_cook||"—")}</div></div>
         <div class="info"><div class="k">🧂 Ingredients</div><div class="v">${(r.ingredients||[]).length||"—"}</div></div>
       </div>
-      ${ings?`<h4 class="sec">Ingredients needed</h4><ul class="ings" id="inglist">${ings}</ul>`:""}
-      ${steps?`<h4 class="sec">How to cook — steps</h4><ol class="steps">${steps}</ol>`
-        :`<div class="note">No step-by-step method on file for this one yet — the recipe details here come from the dish's listing. Check the video link below for the full method.</div>`}
+      ${hasIngs?`<h4 class="sec">Ingredients needed</h4><ul class="ings" id="inglist">${ings}</ul>`:""}
+      ${hasSteps?`<h4 class="sec">How to cook — steps</h4><ol class="steps">${steps}</ol>`:""}
+      ${(!hasIngs&&!hasSteps)?`<div class="note">The creator didn't include the ingredient list or method in this post — it's often shared via DM or comments. The time and calories shown are typical for this kind of dish.</div>`
+        :(!hasSteps?`<div class="note">${r.youtube?`No written method on file — the video below walks through it.`:`No written method on file for this one.`}</div>`:"")}
       ${r.youtube?`<a class="yt" href="${esc(r.youtube)}" target="_blank" rel="noopener">▶ Watch video recipe</a>`:""}
       ${(r.time_source==="estimated"||r.calories_source==="estimated")?`<div class="note">Heads-up: the time and/or calories for this recipe are estimates based on its category. Treat them as a rough guide.</div>`:""}
     </div>`;
